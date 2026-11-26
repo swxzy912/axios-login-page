@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>登录 - 前后端分离作业</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="login-card">
+    <h1>用户登录</h1>
+    <p class="subtitle">前端 Axios 调用后端登录接口</p>
+
+    <form id="loginForm" novalidate>
+      <div class="form-item">
+        <label for="username">用户名</label>
+        <input type="text" id="username" name="username" placeholder="请输入用户名" autocomplete="username">
+      </div>
+
+      <div class="form-item">
+        <label for="password">密码</label>
+        <input type="password" id="password" name="password" placeholder="请输入密码" autocomplete="current-password">
+      </div>
+
+      <p id="message" class="message" role="alert"></p>
+
+      <button type="submit" id="submitBtn">登 录</button>
+    </form>
+
+    <p class="tips">测试账号：admin / 123456 或 student / 123456</p>
+  </div>
+
+  <!-- axios 第三方库（本地引入，离线可用） -->
+  <script src="js/axios.min.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

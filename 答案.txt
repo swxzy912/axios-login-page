@@ -1,0 +1,67 @@
+简答题答案（可直接粘贴到答题框）
+
+题目：使用前后端分离方式，前端通过axios第三方库实现后端接口的调用，最终实现登录页面。
+
+答案：
+
+一、实现思路
+1. 前后端分离：前端负责登录页面和表单校验，后端只负责提供登录接口，两者通过 HTTP + JSON 交互，各自独立运行。
+2. 后端：用 Node.js 提供 POST /api/login 接口，接收 JSON 格式的 {username, password}，校验正确后返回 {code:200, message:"登录成功", data:{token}}，失败返回 401；同时设置 CORS 响应头允许前端跨域请求。
+3. 前端：在 HTML 中通过 script 标签引入 axios 第三方库，表单提交时用 axios.post 调用后端接口，根据返回结果提示"登录成功/失败"，成功时保存 token 并可跳转主页。
+
+二、前端关键代码
+<script src="js/axios.min.js"></script>
+<script>
+document.getElementById('loginForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const username = document.getElementById('username').value.trim();
+  const password = document.getElementById('password').value.trim();
+  if (!username || !password) { alert('请输入用户名和密码'); return; }
+  try {
+    const res = await axios.post('http://localhost:3001/api/login', { username, password }, { timeout: 5000 });
+    if (res.data.code === 200) {
+      localStorage.setItem('token', res.data.data.token);
+      alert('登录成功，欢迎 ' + res.data.data.nickname);
+      // location.href = 'home.html';
+    } else {
+      alert(res.data.message || '登录失败');
+    }
+  } catch (err) {
+    alert(err.response ? err.response.data.message : '无法连接后端服务');
+  }
+});
+</script>
+
+三、后端关键代码（Node.js 原生 http，零依赖）
+const http = require('http');
+http.createServer((req, res) => {
+  res.writeHead(200, {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Content-Type': 'application/json; charset=utf-8'
+  });
+  if (req.method === 'POST' && req.url === '/api/login') {
+    let data = '';
+    req.on('data', chunk => data += chunk);
+    req.on('end', () => {
+      const { username, password } = JSON.parse(data);
+      if (username === 'admin' && password === '123456') {
+        res.end(JSON.stringify({ code: 200, message: '登录成功', data: { token: 'xxx' } }));
+      } else {
+        res.end(JSON.stringify({ code: 401, message: '用户名或密码错误' }));
+      }
+    });
+  } else { res.end(JSON.stringify({ code: 404, message: '接口不存在' })); }
+}).listen(3001, () => console.log('server running at http://localhost:3001'));
+
+四、运行与测试
+1. 启动后端：node server.js（监听 3001 端口）。
+2. 打开前端 login.html，输入 admin / 123456。
+3. 前端通过 axios 调用 /api/login，页面显示"登录成功"。
+
+五、要点总结
+- axios 是 Promise 风格的 HTTP 客户端，支持 async/await，自动转换 JSON。
+- 跨域由后端通过 Access-Control-Allow-Origin 头解决。
+- 实际项目中密码应加密存储、接口应返回 JWT，并增加数据库校验；此处为演示简化实现。
+
+完整可运行代码见同目录 frontend/ 与 server/ 文件夹，GitHub 仓库地址见 README。

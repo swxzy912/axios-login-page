@@ -1,0 +1,10 @@
+{
+  "name": "axios-login-server",
+  "version": "1.0.0",
+  "description": "前后端分离登录作业 - 后端登录接口（零依赖）",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "license": "ISC"
+}
